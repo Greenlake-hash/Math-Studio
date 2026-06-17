@@ -1,0 +1,18 @@
+{
+  "name": "unified-math-visualisation-dashboard",
+  "version": "1.0.0",
+  "description": "A Replit-ready SPA for 2D geometry, 3D graphing, probability simulation, and linear algebra visualisation.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": [
+    "math",
+    "visualisation",
+    "geometry",
+    "threejs",
+    "chartjs",
+    "replit"
+  ],
+  "license": "MIT"
+}

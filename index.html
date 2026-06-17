@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Unified Math Visualisation Dashboard</title>
+  <link rel="icon" href="data:," />
+  <script>
+    tailwind = {
+      config: {
+        theme: {
+          extend: {
+            colors: {
+              ink: "#07111f",
+              panel: "#0d1628",
+              panelSoft: "#121f35",
+              line: "#24324a",
+              cyan: "#22d3ee",
+              mint: "#34d399",
+              amber: "#f59e0b"
+            }
+          }
+        }
+      }
+    };
+  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />
+  <link rel="stylesheet" href="./styles.css" />
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjs@12.4.2/lib/browser/math.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.165.0/examples/jsm/"
+      }
+    }
+  </script>
+  <script type="module" src="./app.js"></script>
+</head>
+<body class="bg-ink text-slate-100">
+  <div id="app" class="app-shell">
+    <aside class="sidebar">
+      <div class="brand-block">
+        <div class="brand-mark">M</div>
+        <div>
+          <h1>Math Studio</h1>
+          <p>Unified dashboard</p>
+        </div>
+      </div>
+
+      <nav class="module-nav" aria-label="Modules">
+        <button class="tab-button active" data-module="geometry">
+          <span class="tab-icon">2D</span>
+          <span>
+            <strong>Geometry</strong>
+            <small>Algebra workbench</small>
+          </span>
+        </button>
+        <button class="tab-button" data-module="graph3d">
+          <span class="tab-icon">3D</span>
+          <span>
+            <strong>Grapher</strong>
+            <small>Surfaces and curves</small>
+          </span>
+        </button>
+        <button class="tab-button" data-module="probability">
+          <span class="tab-icon">P</span>
+          <span>
+            <strong>Probability</strong>
+            <small>Distribution simulator</small>
+          </span>
+        </button>
+        <button class="tab-button" data-module="linear">
+          <span class="tab-icon">A</span>
+          <span>
+            <strong>Linear Algebra</strong>
+            <small>Matrices and vectors</small>
+          </span>
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <span class="status-dot"></span>
+        <span>Replit-ready static SPA</span>
+      </div>
+    </aside>
+
+    <main class="main-shell">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">Interactive mathematics</p>
+          <h2 id="moduleTitle">Geometry & Algebra Workbench</h2>
+        </div>
+        <div id="moduleStatus" class="status-pill">Canvas active</div>
+      </header>
+
+      <section id="geometry" class="module active" aria-labelledby="geometry-title">
+        <aside class="control-panel">
+          <div class="panel-heading">
+            <p class="eyebrow">Module 1</p>
+            <h3 id="geometry-title">Geometry & Algebra</h3>
+          </div>
+
+          <div class="field-stack">
+            <label for="geoFunctionInput">Function</label>
+            <div class="input-action">
+              <input id="geoFunctionInput" type="text" value="y = sin(x)" autocomplete="off" />
+              <button id="geoAddEquation" class="primary-button">Add</button>
+            </div>
+            <p id="geoError" class="warning-line" aria-live="polite"></p>
+          </div>
+
+          <div class="control-group">
+            <div class="section-title">
+              <h4>Active Equations</h4>
+              <button id="geoClearEquations" class="ghost-button">Clear</button>
+            </div>
+            <div id="geoEquationList" class="equation-list"></div>
+          </div>
+
+          <div class="control-group">
+            <h4>Primitives</h4>
+            <div class="button-grid">
+              <button class="tool-button" data-primitive="point">Point</button>
+              <button class="tool-button" data-primitive="line">Line</button>
+              <button class="tool-button" data-primitive="circle">Circle</button>
+              <button id="geoClearPrimitives" class="tool-button subtle">Clear</button>
+            </div>
+          </div>
+        </aside>
+
+        <div class="visual-panel">
+          <div class="canvas-frame">
+            <canvas id="geoCanvas"></canvas>
+            <div id="geoCoordinates" class="canvas-badge">x: 0, y: 0</div>
+          </div>
+        </div>
+      </section>
+
+      <section id="graph3d" class="module" aria-labelledby="graph3d-title">
+        <aside class="control-panel">
+          <div class="panel-heading">
+            <p class="eyebrow">Module 2</p>
+            <h3 id="graph3d-title">3D Multi-Variable Grapher</h3>
+          </div>
+
+          <div class="field-stack">
+            <label for="surfaceInput">Surface z = f(x, y)</label>
+            <input id="surfaceInput" type="text" value="z = sin(x) * cos(y)" autocomplete="off" />
+            <div class="domain-grid">
+              <label>X min <input id="xMin" type="number" value="-6" step="0.5" /></label>
+              <label>X max <input id="xMax" type="number" value="6" step="0.5" /></label>
+              <label>Y min <input id="yMin" type="number" value="-6" step="0.5" /></label>
+              <label>Y max <input id="yMax" type="number" value="6" step="0.5" /></label>
+            </div>
+            <button id="surfacePlotButton" class="primary-button full">Plot Surface</button>
+            <p id="surfaceError" class="warning-line" aria-live="polite"></p>
+          </div>
+
+          <div class="control-group">
+            <h4>Parametric Curve</h4>
+            <div class="field-stack compact">
+              <label>x(t) <input id="curveX" type="text" value="3 * cos(t)" /></label>
+              <label>y(t) <input id="curveY" type="text" value="3 * sin(t)" /></label>
+              <label>z(t) <input id="curveZ" type="text" value="t / 2" /></label>
+              <div class="domain-grid two">
+                <label>t min <input id="tMin" type="number" value="-6.28" step="0.1" /></label>
+                <label>t max <input id="tMax" type="number" value="6.28" step="0.1" /></label>
+              </div>
+              <button id="curvePlotButton" class="secondary-button full">Plot Curve</button>
+              <p id="curveError" class="warning-line" aria-live="polite"></p>
+            </div>
+          </div>
+        </aside>
+
+        <div class="visual-panel">
+          <div id="threeViewport" class="three-viewport"></div>
+        </div>
+      </section>
+
+      <section id="probability" class="module" aria-labelledby="probability-title">
+        <aside class="control-panel">
+          <div class="panel-heading">
+            <p class="eyebrow">Module 3</p>
+            <h3 id="probability-title">Probability Simulator</h3>
+          </div>
+
+          <div class="field-stack">
+            <label for="distributionSelect">Distribution</label>
+            <select id="distributionSelect">
+              <option value="normal">Normal</option>
+              <option value="uniform">Uniform</option>
+              <option value="exponential">Exponential</option>
+              <option value="binomial">Binomial</option>
+              <option value="poisson">Poisson</option>
+            </select>
+          </div>
+
+          <div id="distributionParams" class="control-group"></div>
+
+          <div class="control-group">
+            <h4>Interval</h4>
+            <div class="field-stack compact">
+              <select id="intervalMode">
+                <option value="less">P(X &lt; a)</option>
+                <option value="between" selected>P(a &lt; X &lt; b)</option>
+                <option value="greater">P(X &gt; a)</option>
+              </select>
+              <div class="domain-grid two">
+                <label>a <input id="intervalA" type="number" value="-1" step="0.1" /></label>
+                <label>b <input id="intervalB" type="number" value="1" step="0.1" /></label>
+              </div>
+              <div id="probabilityReadout" class="readout">P = 0.0000</div>
+            </div>
+          </div>
+        </aside>
+
+        <div class="visual-panel">
+          <div class="chart-frame">
+            <canvas id="probabilityChart"></canvas>
+          </div>
+        </div>
+      </section>
+
+      <section id="linear" class="module" aria-labelledby="linear-title">
+        <aside class="control-panel">
+          <div class="panel-heading">
+            <p class="eyebrow">Module 4</p>
+            <h3 id="linear-title">Matrix & Vector Suite</h3>
+          </div>
+
+          <div class="control-group">
+            <div class="section-title">
+              <h4>Matrix Operations</h4>
+              <div class="mini-selects">
+                <select id="matrixRows"></select>
+                <span>x</span>
+                <select id="matrixCols"></select>
+              </div>
+            </div>
+            <div id="matrixGrid" class="matrix-grid"></div>
+            <div id="matrixMetrics" class="metric-stack"></div>
+          </div>
+
+          <div class="control-group">
+            <div class="section-title">
+              <h4>Vector Transformer</h4>
+              <select id="vectorMode">
+                <option value="2">2D</option>
+                <option value="3">3D</option>
+              </select>
+            </div>
+            <div id="vectorInputs" class="vector-inputs"></div>
+            <div id="transformGrid" class="matrix-grid"></div>
+            <button id="animateVector" class="primary-button full">Animate Transform</button>
+            <div id="vectorReadout" class="readout">v -> Av</div>
+          </div>
+        </aside>
+
+        <div class="visual-panel">
+          <div class="canvas-frame">
+            <canvas id="vectorCanvas"></canvas>
+            <div id="vector3dViewport" class="three-viewport hidden"></div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+</body>
+</html>
